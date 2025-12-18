@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
@@ -14,44 +16,86 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.bb.moviedatabaseassessment.domain.model.Genre
 import com.bb.moviedatabaseassessment.domain.model.Movie
+import com.bb.moviedatabaseassessment.ui.viewmodel.DiscoverUiState
+import com.bb.moviedatabaseassessment.ui.viewmodel.DiscoverViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DiscoverMoviesScreen(
     genre: Genre,
-    movies: List<Movie>,
+    vm: DiscoverViewModel,
     onBack: () -> Unit,
     onMovieClick: (Movie) -> Unit
 ) {
+    val state by vm.uiState.collectAsState()
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(genre.id) { vm.loadFirst(genre.id) }
+
+    // endless scroll trigger
+    LaunchedEffect(listState, state) {
+        snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
+            .collect { lastVisible ->
+                val total = listState.layoutInfo.totalItemsCount
+                val shouldLoadMore = lastVisible != null && lastVisible >= total - 4
+                if (shouldLoadMore) vm.loadMore()
+            }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Discover: ${genre.name}") },
-                navigationIcon = {
-                    TextButton(onClick = onBack) { Text("Back") }
-                }
+                navigationIcon = { TextButton(onClick = onBack) { Text("Back") } }
             )
         }
     ) { padding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
-            items(movies) { movie ->
-                ListItem(
-                    headlineContent = { Text(movie.title) },
-                    supportingContent = { Text("Rating: ${movie.rating} • ${movie.year}") },
+
+        when (val s = state) {
+            is DiscoverUiState.Loading -> {
+                CircularProgressIndicator(modifier = Modifier.padding(padding))
+            }
+
+            is DiscoverUiState.Error -> {
+                Text("Error: ${s.message}", modifier = Modifier.padding(padding))
+            }
+
+            is DiscoverUiState.Success -> {
+                LazyColumn(
+                    state = listState,
                     modifier = Modifier
-                        .clickable { onMovieClick(movie) }
-                        .fillMaxWidth()
-                )
-                HorizontalDivider()
+                        .fillMaxSize()
+                        .padding(padding)
+                ) {
+                    items(s.movies) { movie ->
+                        val ratingText = movie.voteAverage?.toString() ?: "-"
+                        val dateText = movie.releaseDate ?: "-"
+
+                        ListItem(
+                            headlineContent = { Text(movie.title) },
+                            supportingContent = { Text("Rating: $ratingText • $dateText") },
+                            modifier = Modifier
+                                .clickable { onMovieClick(movie) }
+                                .fillMaxWidth()
+                        )
+                        HorizontalDivider()
+                    }
+
+                    if (s.isLoadingMore) {
+                        item {
+                            CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                        }
+                    }
+                }
             }
         }
     }
-
 }

@@ -23,41 +23,23 @@ import com.bb.moviedatabaseassessment.domain.model.Review
 @Composable
 fun MovieDetailScreen(
     movie: Movie,
-    reviews: List<Review>,
     onBack: () -> Unit
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(movie.title) },
-                navigationIcon = {
-                    TextButton(onClick = onBack) { Text("Back") }
-                }
+                title = { Text(movie.title.orEmpty()) },
+                navigationIcon = { TextButton(onClick = onBack) { Text("Back") } }
             )
         }
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Text(text = "Primary info", style = MaterialTheme.typography.titleMedium)
-            Text(text = movie.overview)
-
-            HorizontalDivider()
-
-            Text(text = "Reviews", style = MaterialTheme.typography.titleMedium)
-            reviews.take(3).forEach { r ->
-                Text(text = "• ${r.author}: ${r.content}")
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Trailer: nanti link YouTube ditaruh di sini (button/open intent)",
-                style = MaterialTheme.typography.bodySmall
-            )
+        Column(Modifier.padding(padding).padding(16.dp)) {
+            Text(movie.title.orEmpty(), style = MaterialTheme.typography.titleLarge)
+            Spacer(Modifier.height(8.dp))
+            Text("Release: ${movie.releaseDate ?: "-"}")
+            Text("Rating: ${movie.voteAverage ?: "-"}")
+            Spacer(Modifier.height(12.dp))
+            Text(movie.overview.orEmpty())
         }
     }
 }

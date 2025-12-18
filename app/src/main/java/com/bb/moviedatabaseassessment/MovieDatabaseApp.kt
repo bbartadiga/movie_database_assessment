@@ -1,46 +1,69 @@
 package com.bb.moviedatabaseassessment
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.bb.moviedatabaseassessment.data.remote.NetworkModule
+import com.bb.moviedatabaseassessment.data.repository.DiscoverRepositoryImpl
+import com.bb.moviedatabaseassessment.data.repository.GenresRepositoryImpl
+import com.bb.moviedatabaseassessment.data.repository.MovieRepositoryImpl
 import com.bb.moviedatabaseassessment.domain.model.Genre
 import com.bb.moviedatabaseassessment.domain.model.Movie
 import com.bb.moviedatabaseassessment.ui.preview.SampleData
 import com.bb.moviedatabaseassessment.ui.screen.DiscoverMoviesScreen
 import com.bb.moviedatabaseassessment.ui.screen.GenresScreen
 import com.bb.moviedatabaseassessment.ui.screen.MovieDetailScreen
+import com.bb.moviedatabaseassessment.ui.screen.PopularMoviesScreen
 import com.bb.moviedatabaseassessment.ui.theme.MovieDatabaseAssessmentTheme
+import com.bb.moviedatabaseassessment.ui.viewmodel.DiscoverViewModel
+import com.bb.moviedatabaseassessment.ui.viewmodel.DiscoverViewModelFactory
+import com.bb.moviedatabaseassessment.ui.viewmodel.GenresViewModel
+import com.bb.moviedatabaseassessment.ui.viewmodel.GenresViewModelFactory
+import com.bb.moviedatabaseassessment.ui.viewmodel.PopularMoviesViewModel
 
 @Composable
 fun MovieDatabaseApp() {
     MovieDatabaseAssessmentTheme {
-        Surface {
-            //navigation
+        Surface(modifier = Modifier.fillMaxSize()) {
+
             var selectedGenre by remember { mutableStateOf<Genre?>(null) }
             var selectedMovie by remember { mutableStateOf<Movie?>(null) }
 
+            val genresRepo = GenresRepositoryImpl(NetworkModule.tmdbApi)
+            val genresVm: GenresViewModel =
+                viewModel(factory = GenresViewModelFactory(genresRepo))
+
+            val discoverRepo = DiscoverRepositoryImpl(NetworkModule.tmdbApi)
+            val discoverVm: DiscoverViewModel =
+                viewModel(factory = DiscoverViewModelFactory(discoverRepo))
+
             when {
-                selectedGenre == null -> GenresScreen(
-                    genres = SampleData.genres,
-                    onGenreClick = { selectedGenre = it }
-                )
+                selectedGenre == null -> {
+                    GenresScreen(
+                        vm = genresVm,
+                        onGenreClick = { selectedGenre = it }
+                    )
+                }
 
-                selectedMovie == null -> DiscoverMoviesScreen(
-                    genre = selectedGenre!!,
-                    movies = SampleData.movies,
-                    onBack = { selectedGenre = null },
-                    onMovieClick = { selectedMovie = it }
-                )
+                selectedMovie == null -> {
+                    DiscoverMoviesScreen(
+                        genre = selectedGenre!!,
+                        vm = discoverVm,
+                        onBack = { selectedGenre = null },
+                        onMovieClick = { selectedMovie = it }
+                    )
+                }
 
-                else -> MovieDetailScreen(
-                    movie = selectedMovie!!,
-                    reviews = SampleData.reviews,
-                    onBack = { selectedMovie = null }
-                )
+                else -> {
+                    // nanti detail
+                }
             }
         }
     }
