@@ -11,11 +11,6 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface TmdbApi{
-    @GET("movie/popular")
-    suspend fun getPopularMovies(
-        @Query("page") page: Int =  1,
-        @Query("language") language: String = "en-US"
-    ): PagedResponseDto<MovieDto>
 
     @GET("genre/movie/list")
     suspend fun getMovieGenres(

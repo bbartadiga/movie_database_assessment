@@ -1,8 +1,5 @@
 package com.bb.moviedatabaseassessment.domain.repository
 
-import android.provider.MediaStore
-import com.bb.moviedatabaseassessment.domain.model.Genre
-import com.bb.moviedatabaseassessment.domain.model.Movie
 import com.bb.moviedatabaseassessment.domain.model.MovieDetail
 import com.bb.moviedatabaseassessment.domain.model.MoviePage
 import com.bb.moviedatabaseassessment.domain.model.Review

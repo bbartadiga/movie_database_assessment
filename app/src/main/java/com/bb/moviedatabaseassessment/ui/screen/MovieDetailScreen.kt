@@ -1,7 +1,6 @@
 package com.bb.moviedatabaseassessment.ui.screen
 
 import android.content.Intent
-import android.inputmethodservice.Keyboard.Row
 import android.net.Uri
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -61,7 +60,7 @@ fun MovieDetailScreen(
 
     LaunchedEffect(movie.id) { vm.load(movie.id) }
 
-    // endless scroll reviews
+    // endless scroll for reviews
     LaunchedEffect(listState) {
         snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
             .distinctUntilChanged()
@@ -75,7 +74,7 @@ fun MovieDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(movie.title.orEmpty()) },
+                title = { Text(movie.title) },
                 navigationIcon = { TextButton(onClick = onBack) { Text("Back") } }
             )
         }
@@ -108,7 +107,7 @@ fun MovieDetailScreen(
                         Spacer(Modifier.width(16.dp))
 
                         Column(Modifier.weight(1f)) {
-                            Text(movie.title.orEmpty(), style = MaterialTheme.typography.titleLarge)
+                            Text(movie.title, style = MaterialTheme.typography.titleLarge)
                             Spacer(Modifier.height(8.dp))
                             Text("Release: ${movie.releaseDate ?: "-"}")
                             Text("Rating: ${movie.voteAverage ?: "-"}")

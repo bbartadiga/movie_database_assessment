@@ -1,6 +1,5 @@
 package com.bb.moviedatabaseassessment.data.remote
 
-import android.util.Log
 import com.bb.moviedatabaseassessment.BuildConfig
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -11,7 +10,6 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 
 object NetworkModule {
     private val authInterceptor = Interceptor { chain ->
-        Log.d("TMDB", "tokenLen=${BuildConfig.TMDB_ACCESS_TOKEN.length}")
         val req = chain.request().newBuilder()
             .addHeader("accept", "application/json")
             .addHeader("Authorization", "Bearer ${BuildConfig.TMDB_ACCESS_TOKEN}")

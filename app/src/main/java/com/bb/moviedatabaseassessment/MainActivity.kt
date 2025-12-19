@@ -15,14 +15,5 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// screens
-
-//Preview
-
-
-//Models
-
-
-//Sample data
 
 
