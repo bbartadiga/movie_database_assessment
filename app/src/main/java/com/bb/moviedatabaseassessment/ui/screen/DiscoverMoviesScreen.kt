@@ -4,9 +4,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -21,11 +23,18 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.bb.moviedatabaseassessment.domain.model.Genre
 import com.bb.moviedatabaseassessment.domain.model.Movie
+import com.bb.moviedatabaseassessment.ui.utils.posterUrl
 import com.bb.moviedatabaseassessment.ui.viewmodel.DiscoverUiState
 import com.bb.moviedatabaseassessment.ui.viewmodel.DiscoverViewModel
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,7 +49,7 @@ fun DiscoverMoviesScreen(
 
     LaunchedEffect(genre.id) { vm.loadFirst(genre.id) }
 
-    // endless scroll trigger
+    // endless scroll
     LaunchedEffect(listState, state) {
         snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
             .collect { lastVisible ->
@@ -78,10 +87,24 @@ fun DiscoverMoviesScreen(
                     items(s.movies) { movie ->
                         val ratingText = movie.voteAverage?.toString() ?: "-"
                         val dateText = movie.releaseDate ?: "-"
+                        val url = posterUrl(movie.posterPath)
 
                         ListItem(
                             headlineContent = { Text(movie.title) },
                             supportingContent = { Text("Rating: $ratingText • $dateText") },
+                            leadingContent = {
+                                AsyncImage(
+                                    model = ImageRequest.Builder(LocalContext.current)
+                                        .data(url)
+                                        .crossfade(true)
+                                        .build(),
+                                    contentDescription = "Poster",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                    .size(width = 56.dp, height = 84.dp)
+                                        .clip(RoundedCornerShape(8.dp))
+                                )
+                            },
                             modifier = Modifier
                                 .clickable { onMovieClick(movie) }
                                 .fillMaxWidth()

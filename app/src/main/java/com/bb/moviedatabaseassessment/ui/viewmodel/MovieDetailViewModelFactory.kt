@@ -1,16 +1,16 @@
 package com.bb.moviedatabaseassessment.ui.viewmodel
 
-import com.bb.moviedatabaseassessment.domain.repository.MovieRepository
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.bb.moviedatabaseassessment.domain.repository.MovieRepository
 
-class PopularMoviesViewModelFactory(
+class MovieDetailViewModelFactory(
     private val repo: MovieRepository
 ) : ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(PopularMoviesViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return PopularMoviesViewModel(repo) as T
+        if (modelClass.isAssignableFrom(MovieDetailViewModel::class.java)) {
+            return MovieDetailViewModel(repo) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }

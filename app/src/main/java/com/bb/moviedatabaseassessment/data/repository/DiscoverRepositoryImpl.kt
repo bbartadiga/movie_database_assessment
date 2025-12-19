@@ -20,7 +20,7 @@ class DiscoverRepositoryImpl(
                     id = dto.id,
                     title = dto.title.orEmpty(),
                     overview = dto.overview.orEmpty(),
-                    releaseDate = dto.releseDate,     // <- sesuai DTO kamu
+                    releaseDate = dto.releseDate,
                     posterPath = dto.posterPath,
                     voteAverage = dto.voteAverage
                 )

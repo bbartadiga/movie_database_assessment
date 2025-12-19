@@ -13,20 +13,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bb.moviedatabaseassessment.data.remote.NetworkModule
 import com.bb.moviedatabaseassessment.data.repository.DiscoverRepositoryImpl
 import com.bb.moviedatabaseassessment.data.repository.GenresRepositoryImpl
-import com.bb.moviedatabaseassessment.data.repository.MovieRepositoryImpl
 import com.bb.moviedatabaseassessment.domain.model.Genre
 import com.bb.moviedatabaseassessment.domain.model.Movie
-import com.bb.moviedatabaseassessment.ui.preview.SampleData
 import com.bb.moviedatabaseassessment.ui.screen.DiscoverMoviesScreen
 import com.bb.moviedatabaseassessment.ui.screen.GenresScreen
 import com.bb.moviedatabaseassessment.ui.screen.MovieDetailScreen
-import com.bb.moviedatabaseassessment.ui.screen.PopularMoviesScreen
 import com.bb.moviedatabaseassessment.ui.theme.MovieDatabaseAssessmentTheme
 import com.bb.moviedatabaseassessment.ui.viewmodel.DiscoverViewModel
 import com.bb.moviedatabaseassessment.ui.viewmodel.DiscoverViewModelFactory
 import com.bb.moviedatabaseassessment.ui.viewmodel.GenresViewModel
 import com.bb.moviedatabaseassessment.ui.viewmodel.GenresViewModelFactory
-import com.bb.moviedatabaseassessment.ui.viewmodel.PopularMoviesViewModel
 
 @Composable
 fun MovieDatabaseApp() {
@@ -48,7 +44,10 @@ fun MovieDatabaseApp() {
                 selectedGenre == null -> {
                     GenresScreen(
                         vm = genresVm,
-                        onGenreClick = { selectedGenre = it }
+                        onGenreClick = {
+                            selectedGenre = it
+                            selectedMovie = null
+                        }
                     )
                 }
 
@@ -56,13 +55,19 @@ fun MovieDatabaseApp() {
                     DiscoverMoviesScreen(
                         genre = selectedGenre!!,
                         vm = discoverVm,
-                        onBack = { selectedGenre = null },
+                        onBack = {
+                            selectedGenre = null
+                            selectedMovie = null
+                        },
                         onMovieClick = { selectedMovie = it }
                     )
                 }
 
                 else -> {
-                    // nanti detail
+                    MovieDetailScreen(
+                        movie = selectedMovie!!,
+                        onBack = { selectedMovie = null }
+                    )
                 }
             }
         }
